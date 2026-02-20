@@ -409,6 +409,3 @@ All configurable parameters are managed via environment variables. See `.env.exa
 
 ---
 
-## 📄 License
-
-This project is developed for educational and portfolio purposes.
