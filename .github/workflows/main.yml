@@ -58,7 +58,9 @@ jobs:
           echo '{"class_label": "dogs", "probabilities": [0.08, 0.92]}' > predictions/example_prediction.json
 
       - name: Upload prediction examples as artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: prediction-examples
           path: predictions/
+
+          
