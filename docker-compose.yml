@@ -1,0 +1,17 @@
+version: "3.8"
+services:
+  ml_api:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      - MODEL_PATH=/app/models/my_classifier_model.h5
+      - LOG_LEVEL=DEBUG
+    volumes:
+      - ./models:/app/models
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "http://localhost:8000/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: on-failure
