@@ -23,11 +23,28 @@ jobs:
       - name: Install Python dependencies
         run: pip install -r requirements.txt
 
+      - name: Create dummy model for CI testing
+        run: |
+          mkdir -p models
+          python - <<EOF
+          import tensorflow as tf
+          model = tf.keras.Sequential([
+            tf.keras.layers.Input(shape=(160, 160, 3)),
+            tf.keras.layers.GlobalAveragePooling2D(),
+            tf.keras.layers.Dense(1, activation='sigmoid')
+          ])
+          model.save("models/my_classifier_model.h5")
+          print("Dummy model created successfully!")
+          EOF
+
       - name: Run unit tests with Pytest
-        run: pytest tests/
+        run: pytest tests/ -v
 
       - name: Build Docker image
         run: docker build -t my-ml-api:${{ github.sha }} .
+
+      - name: Tag image as latest
+        run: docker tag my-ml-api:${{ github.sha }} my-ml-api:latest
 
       - name: Log in to Docker Hub (Demo)
         run: echo "Skipping Docker login for demonstration purposes."
@@ -38,26 +55,10 @@ jobs:
       - name: Save prediction examples
         run: |
           mkdir -p predictions
-          echo '{"class_label": "cats", "probabilities": [0.85, 0.15]}' > predictions/example_prediction.json
+          echo '{"class_label": "dogs", "probabilities": [0.08, 0.92]}' > predictions/example_prediction.json
 
       - name: Upload prediction examples as artifact
         uses: actions/upload-artifact@v3
         with:
           name: prediction-examples
           path: predictions/
-
-      - name: Create dummy model for CI
-        run: |
-          python - <<EOF
-          import tensorflow as tf
-          import numpy as np
-          model = tf.keras.Sequential([
-            tf.keras.layers.Input(shape=(160, 160, 3)),
-            tf.keras.layers.GlobalAveragePooling2D(),
-            tf.keras.layers.Dense(1, activation='sigmoid')
-          ])
-          model.save("models/my_classifier_model.h5")
-          EOF
-
-      - name: Run unit tests with Pytest
-        run: pytest tests/ -v
