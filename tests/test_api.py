@@ -11,7 +11,7 @@ def test_health_check_endpoint():
     assert response.status_code == 200
     assert response.json() == {"status": "ok", "message": "API is healthy and model is loaded."}
 
-@patch('src.model.predict_image')
+@patch('src.main.predict_image')  # ← change this line
 def test_predict_success_with_mocked_model(mock_predict):
     mock_predict.return_value = ("cats", [0.85, 0.15])
     dummy_image = Image.new('RGB', (160, 160), color='blue')
